@@ -51,10 +51,17 @@ private:
 public:
 
   /* -- CONSTRUCTOR/DESTRUCTOR */
-
-  Semaphore(int _val);
-
-  ~Semaphore();
+  //Vanilla implementation may need to be changed
+  Semaphore(int _val){
+    value = _val;
+    pthread_cond_init(&c,NULL);
+    pthread_mutex_init(&m,NULL);
+  }
+  //Vanilla implementation may need to be changed
+  ~Semaphore(){
+    pthread_cond_destroy(&c);
+    pthread_mutex_destroy(&m);
+  }
 
   /* -- SEMAPHORE OPERATIONS */
 
