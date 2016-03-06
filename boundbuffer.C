@@ -27,15 +27,37 @@
 
 	/*-----Constructor/Destructor------*/
 		BoundedBuffer(int size){
-			//implement
+			full = new Semaphore(0);
+			empty = new Semaphore(size);
+			pthread_mutex_init(&m,NULL);
+			count = 0;
 		}
 		~BoundedBuffer(){
-			//implement
+			pthread_mutex_destroy(&m);
+			delete full;
+			delete empty;
 		}
 
 	/*-----Deposit/Remove----*/
-		deposit(string item){
-			//implement
+		int deposit(string item){
+			int errNum;
+			//decrease empty and check if P was succesful
+			if(errNum = empty.P() != 0)
+				return errNum;
+			//Critical Section
+			if(errNum = pthread_mutex_lock(&m) != 0)
+				return errNum;
+			buffer.push_back(item);//push item to buffer
+			//Leave Critical Section
+			if(errNum = pthread_mutex_unlock(&m) != 0)
+				return errNum;
+			//increase full
+			if(errNum = full.V() != 0)
+				return errNum;
+
+			//succeeded 
+			return 0;
+
 		}
 
 		remove(){
