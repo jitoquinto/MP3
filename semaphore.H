@@ -64,9 +64,40 @@ public:
   }
 
   /* -- SEMAPHORE OPERATIONS */
+  //Vanilla implementation of P. Will probably need fixes
+  int P(){
+    int errNum;//if pthread_lock or unlock dont work
+      //lock mutex to restrict access to value before decrement
+    if(errNum = pthread_mutex_lock(&m) != 0)
+      return errNum;
+      //decrement value
+    value--;
 
-  int P();
-  int V();
+    //if value is negative then block thread until cond_signal issued
+    if(value < 0){
+      if(errNum = pthread_cond_wait(&c,&m) != 0)
+        return errNum;
+    }
+    //unlock mutex and allow access to value
+    if(errNum = pthread_mutex_unlock(&m) != 0)
+      return errNum;
+    //P() executed correctly 
+    return  0;
+  }
+
+  //Vanilla implementation of V(). Might need fixes
+  int V(){
+    int errNum;//used to check errors that mutex or cond might have
+
+    pthread_mutex_lock(&m);//lock mutex to increment value in critical section
+
+    value++;
+    if(value <= 0){
+      if(errNum = pthread_cond_signal(&c,&m) != 0)
+        return errNum;
+    }
+    pthread_mutex_unlock(&m);
+  }
 };
 
 
