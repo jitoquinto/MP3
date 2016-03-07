@@ -5,7 +5,7 @@
 	Implementation of a bounded buffer for a producer consumer
 */
 
-	#include <vector>
+	#include <queue>
 	#include <string>
 	#include <pthread.h>
 	#include "semaphore.H"
@@ -22,7 +22,7 @@
 		//number of items in buffer
 		int count;
 		//buffer string just for firsts implementation. will be changed.
-		vector<string> buffer;
+		queue<string> buffer;
 	public://public functions
 
 	/*-----Constructor/Destructor------*/
@@ -39,29 +39,45 @@
 		}
 
 	/*-----Deposit/Remove----*/
-		int deposit(string item){
+		void deposit(string item){
 			int errNum;
 			//decrease empty and check if P was succesful
 			if(errNum = empty.P() != 0)
-				return errNum;
+				cout<<" empthy.P() not succesful with error number: "<<errNum<<endl;
 			//Critical Section
 			if(errNum = pthread_mutex_lock(&m) != 0)
-				return errNum;
-			buffer.push_back(item);//push item to buffer
+				cout<<" mutex lock not succesful with error number: "<<errNum<<endl;
+			buffer.push(item);//push item to buffer
 			//Leave Critical Section
 			if(errNum = pthread_mutex_unlock(&m) != 0)
-				return errNum;
+				cout<<" mutex unlock not succesful with error number: "<<errNum<<endl;
 			//increase full
 			if(errNum = full.V() != 0)
-				return errNum;
+				cout<<" full.V() not succesful with error number: "<<errNum<<endl;
 
 			//succeeded 
 			return 0;
 
 		}
 
-		remove(){
+		string remove(){
 			//implement
+			int errNum;
+			string item;
+			//decrease full and check if P sucessful
+			if(errNum = full.P() != 0)
+				cout<<"full.P() not successful with error number: "<<errNum<<endl;
+			//enter critical section
+			if(errNum = pthread_mutex_lock(&m) != 0)
+				cout<<"mutex lock not successful with error number: "<<errNum<<endl;
+			//pop from vector
+			item = buffer.front();
+			buffer.pop();
+			if(errNum = pthread_mutex_unlock(&m) != 0)
+				cout<<"mutex unlock unsuccesful with error number: "<<errNum<<endl;
+			if(errNum = empty.V() != 0)
+				cout<<"empty.V() not successful with error number: "<<errNum<<endl;
+			return string;
 		}
 
 	};
