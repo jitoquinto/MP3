@@ -29,15 +29,19 @@
 #include <unistd.h>
 
 #include "reqchannel.H"
+#include "semaphore.H"
+#include "boundbuffer.H"
 
 using namespace std;
 
 /*--------------------------------------------------------------------------*/
-/* DATA STRUCTURES */ 
+/* Thread Arguments */ 
 /*--------------------------------------------------------------------------*/
+typedef struct request_arguments{
+  BoundedBuffer* requestBuffer;
+  string request;
 
-    /* -- (none) -- */
-
+}REQUEST_ARGUMENTS;
 /*--------------------------------------------------------------------------*/
 /* CONSTANTS */
 /*--------------------------------------------------------------------------*/
@@ -45,18 +49,40 @@ using namespace std;
     /* -- (none) -- */
 
 /*--------------------------------------------------------------------------*/
-/* FORWARDS */
+/* Thread Functions */
 /*--------------------------------------------------------------------------*/
+  void *insert_buffer(void* arg1){
+    REQUEST_ARGUMENTS* args;
+    args->requestBuffer = arg1->requestBuffer;
+    args->request = arg1->request;
+    
+  }
 
-    /* -- (none) -- */
+  void *remove_buffer(void*){
+
+  }
+  
 
 /*--------------------------------------------------------------------------*/
 /* MAIN FUNCTION */
 /*--------------------------------------------------------------------------*/
 
 int main(int argc, char * argv[]) {
+//testing
+  pthread_t sendReq,proccessReq;
+  BoundedBuffer* buffer = new BoundedBuffer(5);
+  REQUEST_ARGUMENTS* arg1;
+  arg1->requestBuffer = buffer;
+  arg1->string = "hello";
 
-  cout << "CLIENT STARTED:" << endl;
+  pthread_create(&sendReq,NULL,insert_buffer,(void*)arg1);
+
+
+
+
+
+
+ /* cout << "CLIENT STARTED:" << endl;
 
   cout << "Establishing control channel... " << flush;
   RequestChannel chan("control", RequestChannel::CLIENT_SIDE);
@@ -64,7 +90,7 @@ int main(int argc, char * argv[]) {
 
   /* -- Start sending a sequence of requests */
 
-  string reply1 = chan.send_request("hello");
+ /* string reply1 = chan.send_request("hello");
   cout << "Reply to request 'hello' is '" << reply1 << "'" << endl;
 
   string reply2 = chan.send_request("data Joe Smith");
@@ -87,4 +113,6 @@ int main(int argc, char * argv[]) {
   cout << "Reply to request 'quit' is '" << reply4 << "'" << endl;
 
   usleep(1000000);
+  */
+
 }

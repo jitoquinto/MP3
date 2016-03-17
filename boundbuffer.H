@@ -8,9 +8,11 @@
 	#include <queue>
 	#include <string>
 	#include <pthread.h>
+	#include <iostream>
 	#include "semaphore.H"
 
 	using namespace std;
+
 
 	class BoundedBuffer{
 	private://private variables	
@@ -26,16 +28,12 @@
 	public://public functions
 
 	/*-----Constructor/Destructor------*/
-		BoundedBuffer(int size){
-			full = new Semaphore(0);
-			empty = new Semaphore(size);
+		BoundedBuffer(int size):full(0),empty(size),count(0)
+		{
 			pthread_mutex_init(&m,NULL);
-			count = 0;
 		}
 		~BoundedBuffer(){
 			pthread_mutex_destroy(&m);
-			delete full;
-			delete empty;
 		}
 
 	/*-----Deposit/Remove----*/
@@ -54,9 +52,6 @@
 			//increase full
 			if(errNum = full.V() != 0)
 				cout<<" full.V() not succesful with error number: "<<errNum<<endl;
-
-			//succeeded 
-			return 0;
 
 		}
 
@@ -77,7 +72,7 @@
 				cout<<"mutex unlock unsuccesful with error number: "<<errNum<<endl;
 			if(errNum = empty.V() != 0)
 				cout<<"empty.V() not successful with error number: "<<errNum<<endl;
-			return string;
+			return item;
 		}
 
 	};

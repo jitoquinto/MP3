@@ -93,7 +93,7 @@ public:
 
     value++;
     if(value <= 0){
-      if(errNum = pthread_cond_signal(&c,&m) != 0)
+      if(errNum = pthread_cond_signal(&c) != 0)
         return errNum;
     }
     pthread_mutex_unlock(&m);
