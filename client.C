@@ -95,7 +95,7 @@ void* request_thread_function(void* args){
   for(int i=0; i<args1->total_requests; i++){
     args1->buffer->deposit(request);
   }
-  cout<<"Requests for id number " << request.id << " completed."<<endl;
+  cout<<"\n\n\n\nRequests for id number " << request.id << " completed.\n\n\n\n"<<endl;
 }
 
 
@@ -122,6 +122,7 @@ void* worker_thread_function(void* args){
   }
 //if were here kill has been called. lets get outta here
   args1->worker_channel->send_request("quit");
+  pthread_exit(NULL);
 }
 
 void* stat_thread_function(void* args){
@@ -215,7 +216,6 @@ int main(int argc, char * argv[]) {
           showHelp();
           abort();
       }
-
     //Coordinator: Starts client and all elements
     //Create Bounded Buffers
     BoundedBuffer* request_buffer = new BoundedBuffer(buffer_size);
@@ -229,30 +229,29 @@ int main(int argc, char * argv[]) {
     pthread_t stat_threads[3];
 
     //initialize worker arguments
-    WORK_THREAD_ARGS* worker_args[worker_threads_count];
 
     //Initialize stat args
-    STAT_MAP* jane;
+    STAT_MAP* jane =(STAT_MAP*)malloc(sizeof(STAT_MAP));
     jane->id = 0;
     jane->stat_buffer = janes_buffer;
-    STAT_MAP* john;
+
+    STAT_MAP* john=(STAT_MAP*)malloc(sizeof(STAT_MAP));
     john->id = 1;
     john->stat_buffer = johns_buffer;
-    STAT_MAP* joe;
+    STAT_MAP* joe=(STAT_MAP*)malloc(sizeof(STAT_MAP));
     joe->id = 2;
     joe->stat_buffer = joes_buffer;
 
-
     //initialize request arguments
-    REQUEST_THREAD_ARGS* jane_request;
+    REQUEST_THREAD_ARGS* jane_request = (REQUEST_THREAD_ARGS*)malloc(sizeof(REQUEST_THREAD_ARGS));
     jane_request->buffer = request_buffer;
     jane_request->id = 0; 
     jane_request->total_requests = request_number;
-    REQUEST_THREAD_ARGS* john_request;
+    REQUEST_THREAD_ARGS* john_request = (REQUEST_THREAD_ARGS*)malloc(sizeof(REQUEST_THREAD_ARGS));
     john_request->buffer = request_buffer;
     john_request->id = 1;
     john_request->total_requests = request_number;
-    REQUEST_THREAD_ARGS* joe_request;
+    REQUEST_THREAD_ARGS* joe_request = (REQUEST_THREAD_ARGS*)malloc(sizeof(REQUEST_THREAD_ARGS));
     joe_request->buffer = request_buffer;
     joe_request->id = 2;
     joe_request->total_requests = request_number;
@@ -268,12 +267,13 @@ int main(int argc, char * argv[]) {
     for(int i = 0; i < worker_threads_count; i++){
       string new_channel_name = chan.send_request("newthread");
       RequestChannel* temp = new RequestChannel(new_channel_name,RequestChannel::CLIENT_SIDE);
-      worker_args[i]->requests = request_buffer;
-      worker_args[i]->joe_stat = joes_buffer;
-      worker_args[i]->jane_stat = janes_buffer;
-      worker_args[i]->john_stat = johns_buffer;
-      worker_args[i]->worker_channel = temp;
-      pthread_create(&worker_threads[i],NULL,worker_thread_function,(void*)worker_args[i]);
+      WORK_THREAD_ARGS* worker_args = (WORK_THREAD_ARGS*)malloc(sizeof(WORK_THREAD_ARGS));
+      worker_args->requests = request_buffer;
+      worker_args->joe_stat = joes_buffer;
+      worker_args->jane_stat = janes_buffer;
+      worker_args->john_stat = johns_buffer;
+      worker_args->worker_channel = temp;
+      pthread_create(&worker_threads[i],NULL,worker_thread_function,(void*)worker_args);
     }
 
     //create stat threads
@@ -288,9 +288,11 @@ int main(int argc, char * argv[]) {
 
     /*------------ DESTROY EVERYTHING---------------*/
     //well wait for it to finish
+    cout<<"DONESKIES TEST"<<endl;
     for(int i = 0; i<3; i++){
       pthread_join(request_threads[i],NULL);
     }
+    cout<<"DONESKIES TEST"<<endl;
     //deposit kill request to stop the worker threads
     //remember to make sure worker threads redeposit this 
     //request so all threads are killed
@@ -318,6 +320,12 @@ int main(int argc, char * argv[]) {
     //Everything should be closed now. Lets end this 
     string close_reply = chan.send_request("quit");
     cout<<close_reply<<endl;
+    free((void*)jane_request);
+    free((void*)john_request);
+    free((void*)joe_request);
+    free((void*)jane);
+    free((void*)john);
+    free((void*)joe);
     usleep(1000000);
 
   }
