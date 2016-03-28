@@ -51,20 +51,20 @@ private:
 public:
 
   /* -- CONSTRUCTOR/DESTRUCTOR */
-  //Vanilla implementation may need to be changed
+  // may need to be changed
   Semaphore(int _val){
     value = _val;
     pthread_cond_init(&c,NULL);
     pthread_mutex_init(&m,NULL);
   }
-  //Vanilla implementation may need to be changed
+  //implementation may need to be changed
   ~Semaphore(){
     pthread_cond_destroy(&c);
     pthread_mutex_destroy(&m);
   }
 
   /* -- SEMAPHORE OPERATIONS */
-  //Vanilla implementation of P. Will probably need fixes
+  // Will probably need fixes
   int P(){
     int errNum;//if pthread_lock or unlock dont work
       //lock mutex to restrict access to value before decrement
@@ -85,7 +85,7 @@ public:
     return  0;
   }
 
-  //Vanilla implementation of V(). Might need fixes
+  // implementation of V(). Might need fixes
   int V(){
     int errNum;//used to check errors that mutex or cond might have
 

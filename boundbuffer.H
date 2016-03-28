@@ -12,7 +12,16 @@
 	#include "semaphore.H"
 
 	using namespace std;
+	class RequestElement{
+	public:
+		int id;
+		string s;
 
+		RequestElement(){
+			id = 0;
+			s = " ";
+		}
+	};
 
 	class BoundedBuffer{
 	private://private variables	
@@ -24,7 +33,7 @@
 		//number of items in buffer
 		int count;
 		//buffer string just for firsts implementation. will be changed.
-		queue<string> buffer;
+		queue<RequestElement> buffer;
 	public://public functions
 
 	/*-----Constructor/Destructor------*/
@@ -37,7 +46,7 @@
 		}
 
 	/*-----Deposit/Remove----*/
-		void deposit(string item){
+		void deposit(RequestElement item){
 			int errNum;
 			//decrease empty and check if P was succesful
 			if(errNum = empty.P() != 0)
@@ -55,10 +64,10 @@
 
 		}
 
-		string remove(){
+		RequestElement remove(){
 			//implement
 			int errNum;
-			string item;
+			RequestElement item;
 			//decrease full and check if P sucessful
 			if(errNum = full.P() != 0)
 				cout<<"full.P() not successful with error number: "<<errNum<<endl;

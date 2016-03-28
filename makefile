@@ -1,12 +1,12 @@
 # makefile
 
-all: dataserver simpleclient
+all: dataserver client
 
 reqchannel.o: reqchannel.H reqchannel.C
 	g++ -c -g reqchannel.C
 
 dataserver: dataserver.C reqchannel.o 
-	g++ -g -o dataserver dataserver.C reqchannel.o -lpthread\
+	g++ -g -o dataserver dataserver.C reqchannel.o -lpthread
 
-simpleclient: simpleclient.C reqchannel.o semaphore.H boundbuffer.H
-	g++ -g -o simpleclient simpleclient.C reqchannel.o semaphore.H boundbuffer.H
+client: client.C reqchannel.o semaphore.H boundbuffer.H
+	g++ -g -o client client.C reqchannel.o semaphore.H boundbuffer.H -lpthread
